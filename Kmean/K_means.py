@@ -57,6 +57,15 @@ def main():
                 min_value[i] = feature[i]
         first_min = True
 
+
+    # Lưu max_value và min_value vào trong csdl
+    data = ';'.join(str(num) for num in max_value)
+    cursor.execute('insert into max_vector values(:data)', data=data)
+    data = ';'.join(str(num) for num in min_value)
+    cursor.execute('insert into min_vector values(:data)', data=data)
+    connection.commit()
+
+
     # Chuẩn hóa vector đặc trưng
     for feature in feature_vectors:
         for i in range(feature.size):
