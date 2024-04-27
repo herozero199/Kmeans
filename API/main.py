@@ -14,8 +14,8 @@ connection = oracledb.connect(
 )
 cursor = connection.cursor()
 
-# app = Flask(__name__)
-# @app.route('/api')
+app = Flask(__name__)
+@app.route('/api')
 def findImage(image):
 
     #  Trích xuất đặc trưng
@@ -59,7 +59,6 @@ def findImage(image):
     cursor.execute('select * from flowers where cluster_id = :cluster_id', cluster_id=cluster_id)
     images = cursor.fetchall()
 
-
     # Tìm 3 ảnh giống nhất
     index = [0, 0, 0]
     distances = [float('inf'), float('inf'), float('inf')]
@@ -91,21 +90,25 @@ def findImage(image):
 
             distances[k] = new_distance
             index[k] = new_index
-    print(index)
-    print(distances)
 
 
-    # Hiển thị kết quả
+    # Hiển thị kết quả cho test
+    # for i in index:
+    #     blob_data = images[i][1]
+    #     # binary_data = base64.b64encode(blob_data.read())
+    #     # data = binary_data.decode("UTF-8")
+    #     stream = io.BytesIO(blob_data.read())
+    #     image = cv.imdecode(np.frombuffer(stream.read(), np.uint8), cv.IMREAD_COLOR)
+    #     cv.imshow('image', image)
+    #     cv.waitKey(0)
+
+    result = []
     for i in index:
         blob_data = images[i][1]
-        # binary_data = base64.b64encode(blob_data.read())
-        # data = binary_data.decode("UTF-8")
         stream = io.BytesIO(blob_data.read())
         image = cv.imdecode(np.frombuffer(stream.read(), np.uint8), cv.IMREAD_COLOR)
-        cv.imshow('image', image)
-        cv.waitKey(0)
-
-    # return '[{image: data},{},{}]'
+        result.append({image: image})
+    return result
 
 
 # Hàm trích xuất đặc trưng
@@ -196,8 +199,3 @@ def calculate_distance(centroid, new_image):
     for i in range(len(centroid)):
         result += (centroid[i] - new_image[i]) ** 2
     return math.sqrt(result)
-
-
-test_image = cv.imread("H:\\DAT\\HCSDL_DPT\\Test_Image\\test1.jpg")
-test_image = cv.resize(test_image, (300, 360))
-findImage(test_image)
